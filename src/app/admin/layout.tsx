@@ -5,6 +5,103 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Package, ShoppingBag, Calendar, Settings, LogOut, Mail, Menu, Bell, MapPin, BarChart2, User, ChevronDown, MessageCircle, FileText } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
+import { Link as RouterLink } from "next/link"; // Alias if needed, but Link is already imported
+import { useRouter as useNavigationRouter } from "next/navigation";
+
+// --- Notification Component ---
+function NotificationBell() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [notifications, setNotifications] = useState<any[]>([]);
+    const bellRef = useRef<HTMLDivElement>(null);
+    const router = useNavigationRouter(); // Get router
+
+    useEffect(() => {
+        const fetchUnread = async () => {
+            // Mock fetch or real fetch
+            try {
+                // Fetch bookings or messages to count as notifications
+                // For now, simulate functionality or fetch real messages
+                const res = await fetch('/api/messages');
+                if (res.ok) {
+                    const msgs = await res.json();
+                    const unread = msgs.filter((m: any) => !m.isRead);
+                    setNotifications(unread.slice(0, 5)); // Show top 5
+                    setUnreadCount(unread.length);
+                }
+            } catch (e) { console.error(e); }
+        };
+        fetchUnread();
+
+        // Close on click outside
+        const handleClickOutside = (event: MouseEvent) => {
+            if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <div className="relative" ref={bellRef}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="relative text-gray-400 hover:text-[#0F172A] transition-colors p-2 hover:bg-gray-50 rounded-full outline-none"
+            >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-bold text-white">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                )}
+            </button>
+
+            {isOpen && (
+                <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-fade-in-up">
+                    <div className="p-4 border-b border-gray-50 flex justify-between items-center">
+                        <span className="font-bold text-gray-800 text-sm">Notifications</span>
+                        <span className="text-xs text-primary font-medium">{unreadCount} unread</span>
+                    </div>
+
+                    <div className="max-h-[300px] overflow-y-auto">
+                        {notifications.length === 0 ? (
+                            <div className="p-8 text-center text-gray-400 text-sm">
+                                <Bell size={24} className="mx-auto mb-2 opacity-20" />
+                                No new notifications
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-gray-50">
+                                {notifications.map((msg, i) => (
+                                    <div
+                                        key={i}
+                                        onClick={() => router.push('/admin/messages')}
+                                        className="p-4 hover:bg-gray-50 cursor-pointer transition-colors block"
+                                    >
+                                        <div className="flex justify-between items-start mb-1">
+                                            <span className="font-bold text-xs text-secondary truncate max-w-[150px]">{msg.name}</span>
+                                            <span className="text-[10px] text-gray-400">
+                                                {new Date(msg.createdAt).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 line-clamp-2">{msg.message || msg.subject}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
+                        <Link href="/admin/messages" className="text-xs font-bold text-primary hover:text-primary-dark">
+                            View All Messages
+                        </Link>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function AdminLayout({
     children,
 }: {
@@ -174,6 +271,7 @@ export default function AdminLayout({
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50">
                 {/* Header */}
+                {/* Header */}
                 <header className="h-20 flex items-center justify-between px-8 bg-white sticky top-0 z-20 shadow-sm border-b border-gray-100">
                     <div className="flex items-center gap-4">
                         <button
@@ -188,10 +286,8 @@ export default function AdminLayout({
                     </div>
 
                     <div className="flex items-center gap-6">
-                        <button className="relative text-gray-400 hover:text-[#0F172A] transition-colors p-2 hover:bg-gray-50 rounded-full">
-                            <Bell size={20} />
-                            <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                        </button>
+                        {/* Notification Bell */}
+                        <NotificationBell />
 
                         <div className="flex items-center gap-3 pl-6 border-l border-gray-100">
                             <div className="text-right hidden md:block">
