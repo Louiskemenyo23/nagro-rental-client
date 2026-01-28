@@ -40,7 +40,14 @@ function NotificationBell() {
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+
+        // Listen for updates from other components
+        window.addEventListener("messageRead", fetchUnread);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            window.removeEventListener("messageRead", fetchUnread);
+        };
     }, []);
 
     return (

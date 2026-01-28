@@ -12,6 +12,16 @@ export default function MessagesPage() {
     const [selectedMessage, setSelectedMessage] = useState<any | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
 
+    const markAsRead = async (id: string) => {
+        try {
+            await fetch(`/api/messages/${id}`, { method: 'PUT' });
+            // Update local state
+            setMessages(prev => prev.map(m => m._id === id ? { ...m, isRead: true } : m));
+            // Dispatch custom event to notify Bell (optional, but good for UI sync)
+            window.dispatchEvent(new Event('messageRead'));
+        } catch (e) { console.error("Failed to mark read", e); }
+    };
+
     useEffect(() => {
         const fetchMessages = async () => {
             const data = await getMessages();
@@ -93,7 +103,10 @@ export default function MessagesPage() {
                                     <tr
                                         key={msg._id}
                                         className="hover:bg-blue-50/30 transition-colors group cursor-pointer"
-                                        onClick={() => setSelectedMessage(msg)}
+                                        onClick={() => {
+                                            setSelectedMessage(msg);
+                                            if (!msg.isRead) markAsRead(msg._id);
+                                        }}
                                     >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center">
