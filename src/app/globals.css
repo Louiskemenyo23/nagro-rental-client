@@ -1,14 +1,5 @@
 @import "tailwindcss";
 
-:root {
-  --background: #FAFAFA;
-  --foreground: #1A1A1A;
-  --primary: #D4AF37;
-  --primary-hover: #B59326;
-  --secondary: #0F172A;
-  --accent: #E2E8F0;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -18,14 +9,83 @@
   --color-accent: var(--accent);
   --font-heading: var(--font-playfair);
   --font-body: var(--font-outfit);
+
+  /* Custom Animations */
+  --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
+}
+
+:root {
+  --background: #FAFAFA;
+  --foreground: #101010;
+  --primary: #D4AF37;
+  --primary-hover: #B59326;
+  --secondary: #0F172A;
+  --accent: #E2E8F0;
+
+  /* Gradients */
+  --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #996515 100%);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-outfit), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-playfair), serif;
+}
+
+/* Custom Utilities */
+.text-gradient-gold {
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-gradient-gold {
+  background: var(--gold-gradient);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hide Scrollbar Utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
