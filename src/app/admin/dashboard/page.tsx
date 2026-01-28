@@ -281,13 +281,13 @@ export default function Dashboard() {
                     });
                 }
 
-                const totalBookings = bookingsData.length || 0;
+                const totalBookings = bookingsData?.length || 0;
                 const confirmedPercentage = totalBookings > 0 ? (confirmedCount / totalBookings) * 100 : 0;
 
                 setStats({
                     revenue: totalRevenue,
                     bookings: totalBookings,
-                    activePackages: packagesData.length || 0,
+                    activePackages: packagesData?.length || 0,
                     pending: pendingCount,
                     confirmedPercentage,
                     monthlyRevenue
