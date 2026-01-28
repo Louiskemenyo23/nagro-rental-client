@@ -4,9 +4,9 @@ import { getDB, saveDB } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 
 // DELETE existing implementation...
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
+    const { id } = await context.params;
     const db = getDB();
-    const id = params.id;
 
     if (!db.testimonials) return NextResponse.json({ error: "No testimonials found" }, { status: 404 });
 
@@ -21,9 +21,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ success: true });
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
+    const { id } = await context.params;
     const db = getDB();
-    const id = params.id;
     const body = await request.json();
 
     if (!db.testimonials) return NextResponse.json({ error: "No testimonials found" }, { status: 404 });
