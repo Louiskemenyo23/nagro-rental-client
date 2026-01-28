@@ -34,8 +34,9 @@ const INITIAL_DATA = {
 export function getDB() {
     console.log("Loading DB from:", DB_PATH);
     if (!fs.existsSync(DB_PATH)) {
-        console.warn("DB file not found, creating new one.");
-        fs.writeFileSync(DB_PATH, JSON.stringify(INITIAL_DATA, null, 2));
+        console.warn(`DB file not found at ${DB_PATH}. Using initial data.`);
+        // In read-only environments (like Netlify build), we cannot write.
+        // fs.writeFileSync(DB_PATH, JSON.stringify(INITIAL_DATA, null, 2));
         return INITIAL_DATA;
     }
     const fileContent = fs.readFileSync(DB_PATH, 'utf-8');
@@ -50,5 +51,9 @@ export function getDB() {
 }
 
 export function saveDB(data: any) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+    try {
+        fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+    } catch (e) {
+        console.error("Failed to save DB (ReadOnly FS?):", e);
+    }
 }
